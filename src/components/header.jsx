@@ -31,6 +31,11 @@ const Header = () => {
                     Fogot password
                 </Link>
             </li>
+            <li>
+                <Link to={"/cart"}>
+                    cart
+                </Link>
+            </li>
         </ul>
     )
 }

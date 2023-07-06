@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
@@ -13,8 +13,11 @@ import Header from "./components/header";
 import EditExpense from "./pages/EditExpense";
 import EditExpenseDynamic from "./pages/EditExpenseDynamic";
 import ProtectedRoute from "./components/protected-route";
-import RoleProtectedRoute from './components/role-protected-route'
+import RoleProtectedRoute from "./components/role-protected-route";
 import ForgotPassword from "./components/fogot-password";
+import Cart from "./pages/cart";
+
+import CounterContext from "./contex";
 
 const router = createBrowserRouter([
   {
@@ -29,55 +32,64 @@ const router = createBrowserRouter([
   {
     path: "/add-expense",
     element: (
-      <div>
-        <Header/>
-        <AddExpense/>
-      </div>
-    )
+      <ProtectedRoute name="">
+        <Header />
+        <AddExpense />
+      </ProtectedRoute>
+    ),
   },
-{
-  path: "/expenses/:id",
-  element: (
-    <div>
-      <Header/>
-      <EditExpenseDynamic/>
-    </div>
-  )
-},
+  {
+    path: "/expenses/:id",
+    element: (
+      <ProtectedRoute name="">
+      <Header />
+      <AddExpense />
+    </ProtectedRoute>
+    ),
+  },
   {
     path: "/edit-expense",
     element: (
       <RoleProtectedRoute role="admin">
-        <EditExpense/>
+        <EditExpense />
       </RoleProtectedRoute>
-    )
+    ),
   },
   {
     path: "/signin",
     element: (
       <div>
-        <Header/>
-        <SignIn/>
+        <Header />
+        <SignIn />
       </div>
-    )
+    ),
   },
   {
     path: "/forgot-password",
     element: (
       <div>
-        <Header/>
-        <ForgotPassword/>
+        <Header />
+        <ForgotPassword />
       </div>
-    )
+    ),
   },
   {
     path: "/signup",
     element: (
       <div>
-        <Header/>
-        <SignUp/>
+        <Header />
+        <SignUp />
       </div>
-    )
+    ),
+  },
+  {
+    path: "/cart",
+    element: (
+      <div>
+        <Header />
+        <Cart />
+      </div>
+    ),
   },
   {
     path: "*",
@@ -85,16 +97,27 @@ const router = createBrowserRouter([
       <div>
         <div>Not Found!</div>
       </div>
-    )
+    ),
   },
 ]);
 
+const Root = () => {
+  const [count, setCount] = useState(10);
+
+  const onCountUpdate = () => {
+    setCount(count + 1);
+  };
+  return (
+    <React.StrictMode>
+      <CounterContext.Provider value={{ count, onCountUpdate }}>
+        <RouterProvider router={router} />
+      </CounterContext.Provider>
+    </React.StrictMode>
+  );
+};
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
-);
+root.render(<Root />);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
