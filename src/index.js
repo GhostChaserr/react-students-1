@@ -11,7 +11,6 @@ import SignUp from "./pages/Signup";
 import SignIn from "./pages/Signin";
 import Header from "./components/header";
 import EditExpense from "./pages/EditExpense";
-import EditExpenseDynamic from "./pages/EditExpenseDynamic";
 import ProtectedRoute from "./components/protected-route";
 import RoleProtectedRoute from "./components/role-protected-route";
 import ForgotPassword from "./components/fogot-password";
@@ -79,15 +78,6 @@ const router = createBrowserRouter([
       <div>
         <Header />
         <SignUp />
-      </div>
-    ),
-  },
-  {
-    path: "/cart",
-    element: (
-      <div>
-        <Header />
-        <Cart />
       </div>
     ),
   },

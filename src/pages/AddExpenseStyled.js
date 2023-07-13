@@ -5,6 +5,10 @@ export const StyledHeading = styled.h1`
     text-align: center;
 `;
 
+{/* <StyledHeading>
+    
+</StyledHeading> */}
+
 export const StyledContainer =styled.div`
     width: 100%;
     margin-auto: "center";

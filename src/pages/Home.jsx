@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useContext } from 'react'
+import { useContext, useState , useEffect} from 'react'
 
 
 // .dark
@@ -9,70 +9,73 @@ import { useContext } from 'react'
 // import CounterContext  from '../contex'
 
 // Named export
-import { CounterContext } from '../contex'
 import { readLocalStorage } from "../helpers/helpers";
+import Filters from "../components/filters";
+import ExpensesFeed from "../components/expenses-feed";
+
+
+
+
+function filterArrayByOptions(array, filters) {
+    return array.filter(item => {
+      if (filters.minAmount && item.amount < filters.minAmount) {
+        return false;
+      }
+      
+      if (filters.maxAmount && item.amount > filters.maxAmount) {
+        return false;
+      }
+      
+      if (filters.date && item.date !== filters.date) {
+        return false;
+      }
+      
+      return true;
+    });
+  }
 
 const Home = () => {
-    const payload = useContext(CounterContext);
+    const [currentExpenses, setCurrentExpenses] = useState([])
 
-    // 1. Load all expenses
-    const expenses = readLocalStorage("expenses")
+    const onFiltersSelect = (filters) => {
 
-    // 2. Read current user session
-    const currentUserId = localStorage.getItem('id');
 
-    const usersExpenses = expenses.filter((item) => item.userId === parseInt(currentUserId));
-    console.log("User Expenses", usersExpenses);
+        // 1. თუ ფილტრი ცარიელია
+        const filterKeysLength = Object.keys(filters).length;
+        if (filterKeysLength === 0) {
+            const expenses = readLocalStorage("expenses");
+            setCurrentExpenses(expenses);
+            return
+        }
+        const filteredExpenses = filterArrayByOptions(currentExpenses,filters);
+        setCurrentExpenses(filteredExpenses);
 
-    console.log({
-        expenses,
-        currentUserId
-    })
-
-    const handleCountUpdate = () => {
-        payload.onCountUpdate();
     }
-    // const expenses = [
-    //     {
-    //         id: 1,
-    //         type: "income",
-    //         amount: 200,
-    //     },
-    //     {
-    //         id: 2,
-    //         type: "income",
-    //         amount: 200,
-    //     },
-    //     {
-    //         id: 3,
-    //         type: "income",
-    //         amount: 200,
-    //     }
-    // ]
-    
-    const theme = "dark"
+
+    // 1 სცენარი: კომპონენტის ჩატვირთვა.
+    useEffect(() => {
+        const expenses = readLocalStorage("expenses");
+        setCurrentExpenses(expenses);
+    }, [])
+
+
+    // 2 სცენარი: კომპონენტის რე-რენდერი, update
+    useEffect(() => {
+        console.log("შეიცვალა!!")
+    }, [currentExpenses, setCurrentExpenses])
+
+    // 3. სცენარი: კომპონენტი ტოვებს დომს
+    useEffect(() => {
+        return () => {
+            console.log("კომპონენტმა დომი დატოვა!")
+        }
+    }, [])
+
+
     return (
         <div>
-            <button onClick={() => {
-                payload.onCountUpdate();
-            }}>
-                + Add items {payload.count}
-            </button>
-            {usersExpenses.map((exp) => {
-                return (
-                    <div  key={exp.id}>
-                        Expense ID {exp.id}
-                        Expense amount {exp.amount}
-                        <Link to={"/expenses/" + exp.id}>
-                            Edit expense
-                        </Link>
-                        <Link to={"/edit-expense?expenseId=" + exp.id}>
-                            Edit expense Query params
-                        </Link>
-                        
-                    </div>
-                )
-            })}
+            <Filters onFiltersSelect={onFiltersSelect}/>
+            <ExpensesFeed currentExpenses={currentExpenses}/>
         </div>
     )
 }
