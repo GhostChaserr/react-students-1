@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+import { insertExpense, getCurrentUser } from '../firebase'
 import {
   StyledDate,
   StyledLabel,
@@ -43,10 +44,20 @@ const AddExpense = () => {
   const [date, setDate] = useState("");
   const [type, setType] = useState("expense");
   const [category, setCategory] = useState("");
+  const [currentUser, setCurrentUser] = useState();
 
-  const onAddExpense = (e) => {
+  const loadCurrentUser = async () => {
+    const user = await getCurrentUser()
+    setCurrentUser(user);
+  }
+
+
+  useEffect(() => {
+    loadCurrentUser()
+  }, [])
+
+  const onAddExpense = async (e) => {
     e.preventDefault();
-    const currentUserId = localStorage.getItem('id');
 
     const expense = {
       id: new Date().getTime(),
@@ -54,12 +65,12 @@ const AddExpense = () => {
       date,
       type,
       category,
-      userId: parseInt(currentUserId)
+      userId: currentUser.uid
     };
 
-    const expenses = readLocalStorage("expenses")
-    localStorage.setItem("expenses", JSON.stringify(expenses.concat(expense)))
+    console.log(expense)
 
+    await insertExpense(expense.id, expense);
     navigate("/")
 
 

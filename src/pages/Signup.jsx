@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom'
+import { signUp } from '../firebase'
 import { readLocalStorage } from '../helpers/helpers'
 // const user = {
 //     id: "123",
@@ -17,7 +18,7 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("")
 
-  const onRegister = (e) => {
+  const onRegister = async (e) => {
     e.preventDefault();
     const users = readLocalStorage('users')
 
@@ -29,15 +30,19 @@ const SignUp = () => {
         password: password
     }
 
-    const emailExists = users.find(user => user.email === newUser.email);
-    if (emailExists) {
-        setError("იმეილი დაკავებულია!")
-        return;
-    }
+    // Signup auth service
+   const response = await signUp(newUser.email, newUser.password);
+   console.log(response);
 
-    const updated = users.concat([newUser])
-    localStorage.setItem('users', JSON.stringify(updated))
-    localStorage.setItem('id', newUser.id);
+    // const emailExists = users.find(user => user.email === newUser.email);
+    // if (emailExists) {
+    //     setError("იმეილი დაკავებულია!")
+    //     return;
+    // }
+
+    // const updated = users.concat([newUser])
+    // localStorage.setItem('users', JSON.stringify(updated))
+    // localStorage.setItem('id', newUser.id);
     navigate("/")
   }
   return (

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useContext, useState , useEffect} from 'react'
-
+import { readCollection, filterCollectionByKey, getCurrentUser } from '../firebase'
 
 // .dark
 // .light
@@ -34,7 +34,10 @@ function filterArrayByOptions(array, filters) {
     });
   }
 
+window.startTime = '';
+
 const Home = () => {
+    // const [startTime, setStartTime] = useState('');
     const [currentExpenses, setCurrentExpenses] = useState([])
 
     const onFiltersSelect = (filters) => {
@@ -52,29 +55,59 @@ const Home = () => {
 
     }
 
-    // 1 სცენარი: კომპონენტის ჩატვირთვა.
+    const fetchExpensesFromDb = async () => {
+      const response = await readCollection('expenses')
+      const users = await readCollection('users')
+      console.log(response);
+      console.log(users);
+
+      const filteredByUserId = await filterCollectionByKey('expenses', 'userId', '9')
+      console.log(filteredByUserId);
+    }
+
+    const loadCurrentUser = async () => {
+      const user = await getCurrentUser()
+      console.log('user', user);
+    }
+
+
     useEffect(() => {
-        const expenses = readLocalStorage("expenses");
-        setCurrentExpenses(expenses);
+      loadCurrentUser();
+      fetchExpensesFromDb();
     }, [])
 
+    // // 1 სცენარი: კომპონენტის ჩატვირთვა.
+    // useEffect(() => {
+    //     const expenses = readLocalStorage("expenses");
+    //     // setStartTime();
+    //     window.startTime =new Date(); 
+    //     setCurrentExpenses(expenses);
+    // }, [])
 
-    // 2 სცენარი: კომპონენტის რე-რენდერი, update
-    useEffect(() => {
-        console.log("შეიცვალა!!")
-    }, [currentExpenses, setCurrentExpenses])
 
-    // 3. სცენარი: კომპონენტი ტოვებს დომს
-    useEffect(() => {
-        return () => {
-            console.log("კომპონენტმა დომი დატოვა!")
-        }
-    }, [])
+    // // 2 სცენარი: კომპონენტის რე-რენდერი, update
+    // useEffect(() => {
+    //     console.log("შეიცვალა!!")
+    // }, [currentExpenses, setCurrentExpenses])
+
+    // // 3. სცენარი: კომპონენტი ტოვებს დომს
+    // useEffect(() => {
+    //     return () => {
+
+    //         console.log("start time", window.startTime);
+
+    //         const endTime = new Date();
+    //         console.log("end time", endTime);
+
+
+    //         console.log("კომპონენტმა დომი დატოვა!")
+    //     }
+    // }, [])
 
 
     return (
         <div>
-            <Filters onFiltersSelect={onFiltersSelect}/>
+            <Filters name="george" onFiltersSelect={onFiltersSelect}/>
             <ExpensesFeed currentExpenses={currentExpenses}/>
         </div>
     )
